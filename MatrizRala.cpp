@@ -1,11 +1,5 @@
 #include "MatrizRala.h"
 
-#include <cmath>
-#include <list>
-#include <utility>
-#include <sstream>
-#include <iostream>
-
 MatrizRala::MatrizRala() : width(0) {}
 
 MatrizRala::MatrizRala(uint h, uint w) : m(h, map<uint,double>()) , width(w) {}
@@ -200,4 +194,113 @@ MatrizRala vector2matrix(vector<double>& v, uint cant_filas){
         return Res;
     }
     return MatrizRala();
+}
+
+pair<vector<double>,short> MatrizRala::EG(vector<double> bb) {
+    vector<double> res(width,0);
+    short status = 0; //status default, el sistema tiene una unica solucion posible
+    double A_jj, A_ij;
+    MatrizRala copy = *this;
+    for(unsigned int j = 0; j < copy.cantColumnas()-1; ++j){ //itero sobre las columnas de copy (que son las filas de copyT), excepto la ultima porque ahi no tengo que hacer nada
+        unsigned int i = j; //i: indice de la fila.
+        map<uint, double>::iterator it_j = copy[i].begin();
+        while(i < copy.cantFilas() && (it_j == copy[i].end() || it_j->first != j))    //Mientras el 1° elemento no nulo de la fila i no está en la columna j...
+            it_j = copy[++i].begin();     //avanzo a la siguiente fila.
+        if(i < copy.cantFilas()){   //Si encontre una fila con elemento no nulo en la columna j...
+            copy[j].swap(copy[i]);  //Cambio de lugar las filas (para que no haya un 0 en la diagonal).
+            swap(bb[j], bb[i]);     //En consecuencia debo cambiar también el orden de bb.
+            A_jj = it_j->second;    //Debido al swap, it_j es iterador de la fila j.
+            ++i;
+            while(i < copy.cantFilas()){    //Reviso las siguientes filas.
+                map<uint, double>::iterator it1 = copy[i].begin();
+                map<uint, double>::iterator fin1 = copy[i].end();
+                if(it1 != fin1 && it1->first == j){  //Si el elemento en la columna j no es nulo, resto filas.
+                    A_ij = it1->second;
+                    map<uint, double>::iterator it2 = it_j;
+                    ++it2;  //Voy a la siguiente columna relevante de la fila j.
+                    map<uint, double>::iterator fin2 = copy[j].end();
+                    copy[i].erase(it1++);     //El elemento en la columna j debe quedar en 0. Voy a la siguiente columna relevante de la fila i (con it1).
+                    while (it2 != fin2) {  //Mientras no haya acabado la fila para restar:
+                        double resultado_de_la_resta = -(A_ij/A_jj) * (it2->second); //empiezo restando lo que hay que restar
+                        while (it1 != fin1 && it1->first < it2->first) ++it1;
+                        if(it1 == fin1 || it1->first > it2->first) {
+                            if (abs(resultado_de_la_resta) > tolerancia)
+                                copy[i].insert(it1, make_pair(it2->first, resultado_de_la_resta));
+                        }
+                        else{
+                            it1->second += resultado_de_la_resta;
+                            if (abs(it1->second) < tolerancia){
+                                copy[i].erase(it1++);
+                            }
+                            else
+                                ++it1;
+                        }
+                        ++it2;
+                    }
+                    bb[i] -= (A_ij/A_jj)*bb[j]; //no me olvido de actualizar el vector b
+                }
+                ++i;
+            }
+        }
+/*        while(it->first != j && it != copy[j].end()){ //cálculo del paso i si corresponde
+			i = it2->first;
+			//if (abs(A_kk) <= 0.00001){break;} //si me tengo que saltear este paso no calculo nada
+			//if(it2 != copy[j].end() && it2->first == i){//si el elemento j,i es 0 no hago nada en la fila j
+			A_ij = it2->second;
+			map<unsigned int, double>::const_iterator it1 = copy[j].find(j);
+			while(it1 != copy[j].end()){
+				l = it1->first;
+				if(i!=l){
+					copy.asignar(i,l,copy.at(i,l)-(it1->second*A_ij/A_jj));
+					copyT.asignar(l,i,copy.at(i,l));
+				}
+*//*
+                double escalar = A_ij/A_jj;
+                if(escalar != 0){   //Si el escalar es 0 no hago nada.
+                    auto it1_2 = copy[i].begin();
+                    auto fin1 = copy[i].end();
+                    auto it2_2 = copy[j].begin();
+                    auto fin2 = copy[j].end();
+                    while (it2_2 != fin2) {  //Mientras no haya acabado la fila para restar:
+                        double resultado_de_la_resta = -escalar * (it2_2->second); //empiezo restando lo que hay que restar
+                        while (it1_2 != fin1 && it1_2->first < it2_2->first) ++it1_2;
+                        if (it1_2->first == it2_2->first) resultado_de_la_resta += it1_2->second; //Si hay algo distinto de 0 en la coordenada a modificar, lo sumo.
+                        if (abs(resultado_de_la_resta) > 0.000001) copy[i][it2_2->first] = resultado_de_la_resta;    //Si el resultado de la resta no es 0, lo defino en el diccionario/fila.
+                        else copy[i].erase(it2_2); //Si es 0, lo borro del diccionario/fila.
+                        ++it2;
+                    }
+                }
+*//*
+				it1++;
+			}
+			bb[i] -= A_ij/A_jj*bb[j]; //no me olvido de actualizar el vector b
+			it2++;
+			//} //A_jk y A_kk son los valores que determinan a las matrices Mk que uso para llegar desde A a U, sabiendo que PA = LU
+		}*/
+        /*if(cont){
+            copy = Mk*copy;
+            for(j = i + 1; j < copy.cantFilas(); j++){ //revierto la matriz Mk a I
+                Mk.asignar(j,i,0.0);
+            }
+            cont = false;
+        }*/
+    }
+    for(long int i = copy.cantFilas()-1; i >= 0; --i) {
+        auto it = copy[i].begin();
+        A_jj = ((it == copy[i].end() || it->first != i) ? 0 : it->second);
+        if (A_jj != 0) ++it;  //Si A_jj no es 0 avanzo "it", pués no forma parte de la siguiente resta.
+        while (it != copy[i].end()) {
+            bb[i] -= (it->second) * res[it->first];   //b_i - sum_j(A_ij*x_j)
+            ++it;
+        }
+        if (A_jj == 0 && bb[i] != 0) {
+            status = -1; //el sistema es incompatible
+            break;
+        } else if (A_jj == 0 && bb[i] == 0) {
+            status = 1; //hay infinitos resultados
+            res[i] = 0;
+        } else
+            res[i] = bb[i] / A_jj;
+    }
+    return make_pair(res,status);
 }

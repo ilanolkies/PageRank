@@ -4,6 +4,11 @@
 
 #include <map>
 #include <vector>
+#include <cmath>
+#include <list>
+#include <utility>
+#include <sstream>
+#include <iostream>
 
 
 using namespace std;
@@ -43,6 +48,8 @@ public:
     vector<double> operator*(const vector<double> &v);
 
     void operator*(double valor);
+
+    pair<vector<double>,short> EG(vector<double> b);
 
 private:
     vector<map<uint, double> > m; //La matriz va a tener un vector vertical que contiene las filas

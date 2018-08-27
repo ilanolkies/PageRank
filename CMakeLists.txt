@@ -3,4 +3,4 @@ project(PageRank)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(PageRank tp1.cpp)
+add_executable(PageRank tp1.cpp MatrizRala.h MatrizRala.cpp ReadWrite.cpp ReadWrite.h)
