@@ -1,14 +1,14 @@
-#include "MatrizRala.h"
+#include "Matrix.h"
 
-MatrizRala::MatrizRala() : width(0) {}
+Matrix::Matrix() : width(0) {}
 
-MatrizRala::MatrizRala(uint h, uint w) : m(h, map<uint,double>()) , width(w) {}
+Matrix::Matrix(uint h, uint w) : m(h, map<uint,double>()) , width(w) {}
 
-size_t MatrizRala::cantFilas() const {return m.size();}
+size_t Matrix::cantFilas() const {return m.size();}
 
-size_t MatrizRala::cantColumnas() const {return width;}
+size_t Matrix::cantColumnas() const {return width;}
 
-void MatrizRala::asignar(uint f, uint c, const double value) {
+void Matrix::asign(uint f, uint c, const double value) {
     if (abs(value) < tolerancia) {
         m[f].erase(c);
     } else if (f < m.size() and c < width) {
@@ -16,7 +16,7 @@ void MatrizRala::asignar(uint f, uint c, const double value) {
     }
 }
 
-const double MatrizRala::at(uint f, uint c) const {
+const double Matrix::at(uint f, uint c) const {
     double result;
     if(m[f].count(c) == 0) {
         result = 0;
@@ -26,29 +26,29 @@ const double MatrizRala::at(uint f, uint c) const {
     return result;
 }
 
-double& MatrizRala::operator[](pair<uint, uint> p) {
+double& Matrix::operator[](pair<uint, uint> p) {
     if (p.first < m.size() and p.second < width) {
         return m[p.first][p.second];
     }
     return m[0][0];//agregue esto solo para devolver algo en caso de que se invoque mal
 }
 
-MatrizRala MatrizRala::operator+(MatrizRala const &B) {
+Matrix Matrix::operator+(Matrix const &B) {
     if(cantFilas() == B.cantFilas() and cantColumnas() == B.cantColumnas()) {
-        MatrizRala result(cantFilas(), cantColumnas());
+        Matrix result(cantFilas(), cantColumnas());
         map<uint, double>::const_iterator it1 = m[0].begin();
         map<uint, double>::const_iterator it2 = B.m[0].begin();
         uint f = 0;
         while (f < cantFilas()) {
             while(it1 != m[f].end() or it2 != B.m[f].end()) {
                 if (it2 == B.m[f].end() or (it1 != m[f].end() and it1->first < it2->first)){
-                    result.asignar(f, it1->first, it1->second); // B tiene un valor nulo, solo coloco el valor de A.
+                    result.asign(f, it1->first, it1->second); // B tiene un valor nulo, solo coloco el valor de A.
                     it1++;
                 } else if (it1 == m[f].end() or (it2 != B.m[f].end() and it1->first > it2->first)) {
-                    result.asignar(f, it2->first, it2->second); // A tiene un valor nulo, solo coloco el valor de B.
+                    result.asign(f, it2->first, it2->second); // A tiene un valor nulo, solo coloco el valor de B.
                     it2++;
                 } else {
-                    result.asignar(f, it1->first, it1->second + it2->second); //Ambas matrices tienen valores no nulos.
+                    result.asign(f, it1->first, it1->second + it2->second); //Ambas matrices tienen valores no nulos.
                     it1++;
                     it2++;
                 }
@@ -59,14 +59,14 @@ MatrizRala MatrizRala::operator+(MatrizRala const &B) {
         }
         return result;
     } else {
-        MatrizRala result; //no se puede operar, devuelvo matriz 0x0.
+        Matrix result; //no se puede operar, devuelvo matriz 0x0.
         return result;
     }
 }
 
-MatrizRala MatrizRala::operator*(const MatrizRala &B){
+Matrix Matrix::operator*(const Matrix &B){
     if(cantColumnas() == B.cantFilas()) {
-        MatrizRala result(cantFilas(), B.cantColumnas());
+        Matrix result(cantFilas(), B.cantColumnas());
         for(uint i = 0; i < cantFilas(); ++i) { //Recorro las filas de A.
             for (auto it1 = m[i].cbegin(); it1 != m[i].cend(); ++it1) { //Recorro la i-ésima fila de A.
                 for(auto it2 = B.m[it1->first].begin(); it2 != B.m[it1->first].end(); ++it2) {  //Si el it1 esta en columna j, recorro la fila j de B.
@@ -85,14 +85,14 @@ MatrizRala MatrizRala::operator*(const MatrizRala &B){
         }
         return result;
     } else {
-        return MatrizRala(); //No está definida la multiplicación.
+        return Matrix(); //No está definida la multiplicación.
     }
 }
 
-vector<double> MatrizRala::operator*(const vector<double>& v){
-    MatrizRala vect_como_matriz(v.size(), 1);
+vector<double> Matrix::operator*(const vector<double>& v){
+    Matrix vect_como_matriz(v.size(), 1);
 
-    for(uint i = 0; i <v.size(); ++i) vect_como_matriz.asignar(i, 0, v[i]);
+    for(uint i = 0; i <v.size(); ++i) vect_como_matriz.asign(i, 0, v[i]);
 
     vect_como_matriz = (*this)*vect_como_matriz;
     vector<double> res(cantFilas());
@@ -102,7 +102,7 @@ vector<double> MatrizRala::operator*(const vector<double>& v){
     return res;
 }
 
-void MatrizRala::operator*(double valor) {
+void Matrix::operator*(double valor) {
     double acum = 0;
     for (unsigned int f = 0; f<cantFilas(); f++) {
         map<uint, double>::iterator row_iterator = m[f].begin();
@@ -129,7 +129,7 @@ string convertirAString(double num) {
     return cadena;
 }
 
-int cantidadDeDigitosMaxima(MatrizRala &M) {
+int cantidadDeDigitosMaxima(Matrix &M) {
     uint maximo = 0;
     uint cantDigitos = 1;
     for (unsigned int i=0; i < M.cantFilas(); i++) {
@@ -151,7 +151,7 @@ string agregarEspacios(double valor, int cantidadMaxima) {
     return ret;
 }
 
-std::ostream& operator << (std::ostream &o, MatrizRala &B) {
+std::ostream& operator << (std::ostream &o, Matrix &B) {
     int cantDigitos = cantidadDeDigitosMaxima(B);
     for (unsigned int i = 0; i < B.cantFilas(); i++) {
         for (unsigned int j = 0; j < B.cantColumnas(); j++) {
@@ -162,7 +162,7 @@ std::ostream& operator << (std::ostream &o, MatrizRala &B) {
     return o;
 }
 
-void mostrar_matriz_por_consola(MatrizRala& m, string nombre_de_la_matriz){
+void mostrar_matriz_por_consola(Matrix& m, string nombre_de_la_matriz){
     int cantDigitos = cantidadDeDigitosMaxima(m);
     std::cout << std::endl << nombre_de_la_matriz << " =  |";
     for(uint i = 0; i < m.cantFilas()*m.cantColumnas(); ++i){
@@ -186,21 +186,21 @@ void mostrar_vector_por_consola(vector<double>& v, string nombre_del_vector){
     if(!v.empty()) std::cout << v[v.size()-1] << "]";
 }
 
-MatrizRala vector2matrix(vector<double>& v, uint cant_filas){
+Matrix vector2matrix(vector<double>& v, uint cant_filas){
     if(v.size()%cant_filas == 0){
         uint cant_columnas = v.size()/cant_filas;
-        MatrizRala Res(cant_filas, cant_columnas);
-        for(uint i = 0; i < v.size(); ++i) Res.asignar(i/cant_columnas, i%cant_columnas, v[i]);
+        Matrix Res(cant_filas, cant_columnas);
+        for(uint i = 0; i < v.size(); ++i) Res.asign(i/cant_columnas, i%cant_columnas, v[i]);
         return Res;
     }
-    return MatrizRala();
+    return Matrix();
 }
 
-pair<vector<double>,short> MatrizRala::EG(vector<double> bb) {
+pair<vector<double>,short> Matrix::EG(vector<double> bb) {
     vector<double> res(width,0);
     short status = 0; //status default, el sistema tiene una unica solucion posible
     double A_jj, A_ij;
-    MatrizRala copy = *this;
+    Matrix copy = *this;
     for(unsigned int j = 0; j < copy.cantColumnas()-1; ++j){ //itero sobre las columnas de copy (que son las filas de copyT), excepto la ultima porque ahi no tengo que hacer nada
         unsigned int i = j; //i: indice de la fila.
         map<uint, double>::iterator it_j = copy[i].begin();

@@ -1,11 +1,11 @@
-#ifndef PAGERANK_UTIL_CPP
-#define PAGERANK_UTIL_CPP
+#ifndef PAGERANK_READWRTIE_CPP
+#define PAGERANK_READWRTIE_CPP
 
 #include <string>
-#include "MatrizRala.h"
+#include "Matrix.h"
 
-MatrizRala leerMatriz(string nombreArchivo);
+Matrix matrixFromFile(string input_file);
+
 void escribirRanking(string nombreArchivo, vector<double> ranking, double probabilidadDeSaltar);
-
 
 #endif

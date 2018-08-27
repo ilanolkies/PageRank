@@ -2,26 +2,24 @@
 #include <iostream>
 #include <fstream>
 
-MatrizRala leerMatriz(string nombreArchivo) {
-    fstream entrada(nombreArchivo, ios_base::in);
+Matrix matrixFromFile(string input_file) {
+    fstream input(input_file, ios_base::in);
 
-    int cantidadTotalDePaginas;
-    int cantidadTotalDeLinks;
+    int paginas, links;
+    input >> paginas >> links;
 
-    entrada >> cantidadTotalDePaginas >> cantidadTotalDeLinks;
-
-    MatrizRala ret(cantidadTotalDePaginas, cantidadTotalDePaginas);
+    Matrix matrix(paginas, paginas);
 
     int i, j;
 
-    for (int k = 0; k<cantidadTotalDeLinks; k++) {
-        entrada >> i >> j;
-        ret.asignar(j-1, i-1, 1);
+    for (int k = 0; k < links; k++) {
+        input >> i >> j;
+        matrix.asign(j - 1, i - 1, 1);
     }
 
-    entrada.close();
+    input.close();
 
-    return ret;
+    return matrix;
 }
 
 void escribirRanking(string nombreArchivo, vector<double> ranking, double probabilidadDeSaltar) {
@@ -29,7 +27,7 @@ void escribirRanking(string nombreArchivo, vector<double> ranking, double probab
 
     salida << probabilidadDeSaltar << '\n';
 
-    for (vector<double>::iterator it = ranking.begin() ; it != ranking.end(); ++it)
+    for (vector<double>::iterator it = ranking.begin(); it != ranking.end(); ++it)
         salida << *it << '\n';
 
     salida.close();
