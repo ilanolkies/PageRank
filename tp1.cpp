@@ -20,15 +20,15 @@ int main(int argc, char *argv[]) {
 
     Matrix W = matrixFromFile(input_file),
             D = diagonal(W),
-            I = Identity(W.cantFilas());
+            I = Identity(W.rows());
 
     Matrix WD = W*D;
     WD * (-p);
-    Matrix I_pWD = I + WD;
+    WD + I;
 
-    vector<double> e(W.cantFilas(), 1);
+    vector<double> e(W.rows(), 1);
 
-    pair<vector<double>,short> ranking = I_pWD.EG(e);
+    pair<vector<double>,short> ranking = WD.GaussianElimination(e);
 
     normalize(ranking.first);
 
