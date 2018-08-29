@@ -2,7 +2,7 @@
 #define PAGERANK_VECTOROPERATIONS_H
 
 #include <vector>
-
+#include <algorithm>
 using namespace std;
 
 double sum(vector<double> v);
