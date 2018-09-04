@@ -1,6 +1,17 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 project(PageRank)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
-add_executable(PageRank tp1.cpp Matrix.h Matrix.cpp ReadWrite.h ReadWrite.cpp MatrixOperations.h MatrixOperations.cpp VectorOperations.cpp VectorOperations.h)
+include_directories(.)
+
+add_executable(PageRank
+        Matrix.cpp
+        Matrix.h
+        MatrixOperations.cpp
+        MatrixOperations.h
+        ReadWrite.cpp
+        ReadWrite.h
+        tp1.cpp
+        VectorOperations.cpp
+        VectorOperations.h Mediciones.cpp Mediciones.h)
