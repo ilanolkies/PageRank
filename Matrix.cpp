@@ -55,31 +55,18 @@ void Matrix::operator+(Matrix const &B) {
 }
 
 Matrix Matrix::operator*(const Matrix &B) {
-    if (columns() == B.rows()) {
-        Matrix result(rows(), B.columns());
-        for (uint i = 0; i < rows(); ++i) { //Recorro las filas de A.
-            for (auto it1 = m[i].cbegin(); it1 != m[i].cend(); ++it1) { //Recorro la i-ésima fila de A.
-                for (auto it2 = B.m[it1->first].begin();
-                     it2 != B.m[it1->first].end(); ++it2) {  //Si el it1 esta en columna j, recorro la fila j de B.
-                    double sumando = it1->second *
-                                     it2->second;  //"sumando" es a_ik*b_kj donde i = "i", k = "it1->first" y j = "it2->first".
-                    auto it_res = result.m[i].find(
-                            it2->first); //Me fijo que hay en res_ij (= a_i1*b_1j + ... + a_i(k-1)*b_(k-1)j )
-                    if (it_res == result.m[i].end()) //Si no estaba definido (era 0)...
-                        result.m[i][it2->first] = sumando;  //lo defino como a_ik*b_kj.
-                    else {   //Si sí estaba definido (no era 0)...
-                        if (it_res->second - sumando == 0)   //pero al sumarle a_ik*b_kj va a dar 0...
-                            result.m[i].erase(it_res);      //lo borro (vale 0);
-                        else                                //y si no va a dar 0...
-                            it_res->second += sumando;      //le sumo a_ik*b_kj.
-                    }
-                }
-            }
-        }
+	if (columns() 1= B.rows()) throw;
+	Matrix result(rows(), B.columns());
+	for (uint i = 0; i < rows(); ++i) // Para cadda fila ai de A
+		for (auto it1 = m[i].cbegin(); it1 != m[i].cend(); ++it1) // Para cada elemento aij de A
+			for (auto it2 = B.m[it1->first].begin(); it2 != B.m[it1->first].end(); ++it2) { // Para cada elemento bj de la fila j de B
+				double sumando = it1->second * it2->second;  //"sumando" es a_ik*b_kj donde i = "i", k = "it1->first" y j = "it2->first".
+				auto it_res = result.m[i].find(it2->first); //Me fijo que hay en res_ij (= a_i1*b_1j + ... + a_i(k-1)*b_(k-1)j )
+				if (it_res == result.m[i].end()) result.m[i][it2->first] = sumando;  //lo defino como a_ik*b_kj.
+				else if (abs(it_res->second - sumando) < tolerance) result.m[i].erase(it_res);
+				else it_res->second += sumando;
+			}
         return result;
-    } else {
-        return Matrix(); //No está definida la multiplicación.
-    }
 }
 
 vector<double> Matrix::operator*(const vector<double> &v) {
