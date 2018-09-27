@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
     vector<string> v = vector<string>();
 
-    listarDirectorio("/home/christian", v);
+    //listarDirectorio("/home/christian", v);
 
     if (argc != 3) {
         cout << "El programa debe cumplir el siguiente formato: ./tp1 archivo p" << std::endl;
